@@ -1,0 +1,10 @@
+images/
+myntradataset/
+sample/
+upload/
+.venv/
+venv/
+__pycache__/
+*.pkl
+*.jpg
+.DS_Store

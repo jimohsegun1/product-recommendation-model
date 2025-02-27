@@ -1,5 +1,9 @@
-streamlit
-numpy
-tensorflow
-scikit-learn
-pickle-mixin
+numpy  
+pandas  
+scikit-learn  
+tensorflow  
+keras  
+streamlit  
+pickle-mixin  
+opencv-python  
+matplotlib  

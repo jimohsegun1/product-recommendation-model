@@ -237,15 +237,15 @@ import os
 import pickle as pkl
 import numpy as np
 from sklearn.neighbors import NearestNeighbors
-from tensorflow.keras.applications.resnet50 import ResNet50, preprocess_input
-from tensorflow.keras.layers import GlobalMaxPool2D
-from tensorflow.keras.preprocessing import image
-from tensorflow.keras.models import Sequential
+from tensorflow.keras.applications.resnet50 import ResNet50, preprocess_input # type: ignore
+from tensorflow.keras.layers import GlobalMaxPool2D # type: ignore
+from tensorflow.keras.preprocessing import image # type: ignore
+from tensorflow.keras.models import Sequential # type: ignore
 from PIL import Image
 import imageio
 
 # Set page configuration
-st.set_page_config(page_title="Fashion Recommendation System", page_icon="🧥", layout="wide")
+st.set_page_config(page_title="Fashion Recommendation System", page_icon="👗", layout="wide")
 
 # Custom CSS for background and footer
 st.markdown(
@@ -256,6 +256,7 @@ st.markdown(
     }
     footer {
         text-align: center;
+        margin-top: 20px;
         font-size: small;
     }
     </style>
@@ -266,13 +267,14 @@ st.markdown(
 # Header with style
 st.markdown(
     """
-    <h1 style='text-align: center;'>
+    <h1 style='text-align: center; color: #fff;'>
         Fashion Recommendation System
     </h1>
     """,
     unsafe_allow_html=True,
 )
 
+# Sidebar navigation
 st.sidebar.title("Navigation")
 nav = st.sidebar.radio("Go to:", ["Home", "Recommendations", "About"])
 
@@ -296,7 +298,7 @@ neighbors.fit(Image_features)
 def load_image(image_path):
     if image_path.endswith(".avif"):
         avif_img = imageio.imread(image_path, format="avif")
-        img = Image.fromarray(avif_img).resize((224, 224))
+        img = Image.fromarray(avif_img).resize((224, 224))  # Resize to match model input
     else:
         img = image.load_img(image_path, target_size=(224, 224))
     return img
@@ -313,12 +315,40 @@ def extract_features_from_images(image_path, model):
 
 # Home Page
 if nav == "Home":
-    st.subheader("Welcome to the Fashion Recommendation System!")
+    st.subheader("Welcome to the Fashion Recommendation System! 👗💼")
     st.write(
         """
         Discover the perfect fashion matches for your style! Simply upload an image, and our intelligent system will recommend visually similar items to elevate your wardrobe.
         """
     )
+    
+    st.markdown("### Why Fashion Recommendation?")
+    st.write(
+        """
+        - **Personalization**: Tailored recommendations that suit your unique style.
+        - **Convenience**: No need to browse endlessly; get relevant suggestions instantly.
+        - **Exploration**: Discover similar items and styles you may not have considered before.
+        """
+    )
+    
+    st.markdown("### Use Cases")
+    st.write(
+        """
+        - **E-commerce**: Help customers find complementary or alternative fashion items.
+        - **Retail Stores**: Suggest similar items to upsell or cross-sell products.
+        - **Personal Styling**: Assist individuals in curating a cohesive wardrobe.
+        - **Trend Analysis**: Identify trending fashion items or styles.
+        """
+    )
+    
+    with st.expander("How it Works"):
+        st.write(
+            """
+            - Upload an image of a fashion item.
+            - Our AI model analyzes the image and extracts its unique features.
+            - Using these features, the system identifies and recommends similar items from our database.
+            """
+        )
 
 # Recommendations Page
 elif nav == "Recommendations":
@@ -326,6 +356,7 @@ elif nav == "Recommendations":
     upload_file = st.file_uploader("Upload an image", type=["png", "jpg", "jpeg", "webp", "avif"])
     
     if upload_file is not None:
+        # Save uploaded file locally
         file_path = os.path.join('upload', upload_file.name)
         os.makedirs('upload', exist_ok=True)
         with open(file_path, 'wb') as f:
@@ -338,17 +369,32 @@ elif nav == "Recommendations":
             input_img_features = extract_features_from_images(file_path, model)
             distances, indices = neighbors.kneighbors([input_img_features])
         
+        # Display recommendations in a grid
         st.subheader("Recommended Items")
         cols = st.columns(5)
         for i, col in enumerate(cols):
             if i < len(indices[0]) - 1:
-                col.image(filenames[indices[0][i + 1]], caption=f"Recommendation {i+1}", width=180)
+                image_path = filenames[indices[0][i + 1]]
+                if os.path.exists(image_path):
+                    absolute_path = os.path.abspath(image_path)
+                    col.image(absolute_path, caption=f"Recommendation {i+1}", width=180)
+                else:
+                    col.warning(f"Image not found: {image_path}")
 
 # About Page
 elif nav == "About":
     st.subheader("About this System")
     st.write(
         """
-        This Fashion Recommendation System leverages AI to provide accurate recommendations. Using TensorFlow, Scikit-learn, and Streamlit, it extracts features from images and suggests similar fashion items.
+        This Fashion Recommendation System leverages cutting-edge technologies to deliver accurate and efficient recommendations. Here's how it works:
+        """
+    )
+    
+    st.markdown("### 1. TensorFlow and Keras for Feature Extraction")
+    st.write(
+        """
+        - **TensorFlow** is an open-source machine learning framework that powers our deep learning model.
+        - **Keras**, built on TensorFlow, provides a high-level interface to design, build, and train deep learning models efficiently.
+        - The system uses a **pre-trained ResNet50 model** to extract meaningful visual features from images.
         """
     )
